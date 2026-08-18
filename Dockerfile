@@ -1,7 +1,7 @@
 # --- Stage 1: build the real db_engine binary from source -------------------
 # Pinned to a specific commit (not a moving branch) for reproducible
-# builds -- bump this once db_engine's Linux port (PR #16) merges to
-# master, or whenever a newer db_engine commit should be deployed.
+# builds -- bump whenever a newer db_engine commit should be deployed.
+# Currently master's merge commit for PR #16 (the Linux port).
 #
 # Built from the *same* base image as the runtime stage below
 # (node:22-slim), not a generic ubuntu image -- a binary compiled against
@@ -11,7 +11,7 @@
 # stage produced exactly that error in CI (no local Docker available to
 # have caught this before pushing).
 FROM node:22-slim AS engine-build
-ARG DB_ENGINE_REF=1ac01e8c65da50d2beca2fe57bc426c27c868a32
+ARG DB_ENGINE_REF=b2b5616
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential cmake git ca-certificates \
     && rm -rf /var/lib/apt/lists/*
