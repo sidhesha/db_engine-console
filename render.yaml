@@ -1,0 +1,17 @@
+# Render Blueprint (https://render.com/docs/blueprint-spec). Lets
+# connecting this repo on Render auto-detect the service instead of
+# manual dashboard clicking through each setting.
+#
+# Free tier: this service sleeps after ~15 min idle and takes ~30-60s to
+# wake on the next request (accepted tradeoff for an occasionally-visited
+# resume link -- see db_engine's docs/ for the fuller reasoning). Render
+# assigns the actual public URL and its own PORT value; server.js already
+# reads PORT from the environment (see backend/server.js), no changes
+# needed there.
+services:
+  - type: web
+    name: db-engine-console
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /

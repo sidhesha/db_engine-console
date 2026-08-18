@@ -55,7 +55,27 @@ db_engine-console/
 │   └── test_ws_client.js   A tiny headless client for testing the bridge without a browser
 ├── frontend/          Static SQL console (no build step)
 ├── Dockerfile          Multi-stage: builds db_engine from a pinned commit, then bundles it with the bridge
-└── .github/workflows/  CI: builds and smoke-tests the Docker image on every push
+├── render.yaml         Render Blueprint for the backend (free tier)
+└── .github/workflows/
+    ├── docker-build.yml   CI: builds and smoke-tests the Docker image on every push
+    └── deploy-pages.yml   Publishes frontend/ to GitHub Pages on every push to master
+```
+
+## Deploying
+
+**Backend** (Render, free tier): create a Render account, "New +" → "Blueprint", point it at this
+repo — `render.yaml` is picked up automatically. Free-tier services sleep after ~15 min idle and
+take ~30-60s to wake on the next request; an accepted tradeoff for an occasionally-visited link, not
+a bug.
+
+**Frontend** (GitHub Pages, free): in this repo's Settings → Pages, set Source to "GitHub Actions"
+(one-time). `.github/workflows/deploy-pages.yml` then publishes `frontend/` on every push to
+`master`.
+
+Once the backend has a real URL, point the frontend at it by editing `frontend/config.js`:
+
+```js
+window.DB_ENGINE_WS_URL = "wss://<your-render-service>.onrender.com";
 ```
 
 ## Wire protocol
