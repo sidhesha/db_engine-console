@@ -95,12 +95,22 @@ db_engine-console/
 
 ## Redeploying against a newer db_engine
 
-`Dockerfile`'s `DB_ENGINE_REF` build arg pins an exact `db_engine` commit — bump it and push to
-deploy a newer engine build:
+The Docker build tracks `db_engine`'s `master` by default — no manual bumping needed. A cache-busting
+`ADD` in `Dockerfile` re-checks `master`'s HEAD on every build, so a plain rebuild always compiles
+against the latest commit.
 
-```dockerfile
-ARG DB_ENGINE_REF=b2b5616   # <- update to the commit you want deployed
-```
+Two things worth knowing:
+
+- **This only refreshes on the next *build*, not automatically the instant `db_engine` changes.**
+  Render rebuilds when *this* repo gets pushed to (or on a manual "Clear cache & deploy"). If
+  `db_engine` merges a change and nothing pushes here, the deployed engine won't update until
+  something triggers a rebuild.
+- **To pin instead of track** — for a reproducible build or a rollback — pass a specific commit or
+  tag at build time:
+  ```bash
+  docker build --build-arg DB_ENGINE_REF=b2b5616 -t db-engine-console .
+  ```
+  (or set `DB_ENGINE_REF` as a Render environment/build variable for the deployed service).
 
 ## Wire protocol
 
