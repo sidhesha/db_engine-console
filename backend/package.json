@@ -1,0 +1,16 @@
+{
+  "name": "db-engine-console-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A thin WebSocket<->TCP bridge exposing db_engine's SQL server to a browser. Understands nothing about SQL -- it just forwards bytes both directions, one TCP connection to db_engine per WebSocket connection, so per-connection session state (BEGIN/COMMIT) just works.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

@@ -1,0 +1,34 @@
+name: Docker Build
+
+# No local Docker available while developing this repo -- this workflow
+# is the actual verification that the Dockerfile builds and the
+# resulting container runs the bridge + real db_engine binary correctly,
+# not an assumption based on reading the Dockerfile.
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t db-engine-console .
+      - name: Run and smoke-test
+        run: |
+          docker run -d --name console -p 8080:8080 db-engine-console
+          ok=""
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8080 >/dev/null; then ok=1; break; fi
+            sleep 1
+          done
+          echo "----- container logs -----"
+          docker logs console
+          echo "---------------------------"
+          if [ -z "$ok" ]; then
+            echo "bridge never became reachable on :8080"
+            exit 1
+          fi
+          curl -sf http://localhost:8080
+      - name: Stop container
+        if: always()
+        run: docker rm -f console || true

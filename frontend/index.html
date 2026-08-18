@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>db_engine console</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="title">
+      <h1>db_engine console</h1>
+      <p>
+        A relational database engine written from scratch in C++17 — B+ tree index, WAL,
+        MVCC transactions, a real SQL frontend.
+        <a href="https://github.com/sidhesha/db_engine" target="_blank" rel="noopener">See how it's built &rarr;</a>
+      </p>
+    </div>
+    <span id="status" class="status status-connecting">connecting&hellip;</span>
+  </header>
+
+  <main>
+    <section class="editor-pane">
+      <textarea
+        id="sql"
+        spellcheck="false"
+        placeholder="CREATE TABLE users (id string PRIMARY KEY, name string, age int);"
+      ></textarea>
+      <div class="controls">
+        <button id="run">Run <kbd>Ctrl</kbd>+<kbd>Enter</kbd></button>
+        <select id="examples">
+          <option value="">Example queries&hellip;</option>
+          <option value="CREATE TABLE users (id string PRIMARY KEY, name string, age int);">CREATE TABLE</option>
+          <option value="INSERT INTO users VALUES ('1', 'Alice', 30);">INSERT</option>
+          <option value="SELECT * FROM users;">SELECT *</option>
+          <option value="SELECT * FROM users WHERE age > 25;">SELECT ... WHERE</option>
+          <option value="UPDATE users SET age = 31 WHERE id = '1';">UPDATE</option>
+          <option value="DELETE FROM users WHERE id = '2';">DELETE</option>
+          <option value="BEGIN;">BEGIN</option>
+          <option value="COMMIT;">COMMIT</option>
+          <option value="ROLLBACK;">ROLLBACK</option>
+        </select>
+        <button id="clear" class="secondary">Clear output</button>
+      </div>
+    </section>
+
+    <section class="output-pane">
+      <pre id="output" aria-live="polite"></pre>
+    </section>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
