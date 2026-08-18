@@ -1,11 +1,28 @@
+<div align="center">
+
 # db_engine-console
 
-A browser-based SQL console for [`db_engine`](https://github.com/sidhesha/db_engine) — a relational
-database engine written from scratch in C++17 (B+ tree index, write-ahead log, MVCC transactions, a
-real SQL frontend served over TCP).
+**A browser SQL console for [`db_engine`](https://github.com/sidhesha/db_engine)** — a relational
+database engine written from scratch in C++17.
 
-A browser can't open a raw TCP socket, so this repo is a thin bridge plus a minimal frontend that
-lets you run real SQL against the real engine from a browser tab.
+[![Docker Build](https://github.com/sidhesha/db_engine-console/actions/workflows/docker-build.yml/badge.svg)](https://github.com/sidhesha/db_engine-console/actions/workflows/docker-build.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+[**Open the console →**](https://sidhesha.github.io/db_engine-console/)
+
+</div>
+
+---
+
+A browser can't open a raw TCP socket, and `db_engine`'s SQL server speaks exactly one. This repo
+is the thin bridge (plus a minimal frontend) that closes that gap — real SQL, against the real
+engine, from a browser tab, not a mock or a simulated backend.
+
+<p align="center">
+  <a href="https://sidhesha.github.io/db_engine-console/">
+    <img src="docs/screenshot.png" alt="db_engine-console — a live SQL session" width="820">
+  </a>
+</p>
 
 ## How it works
 
@@ -25,6 +42,20 @@ code in the bridge — `db_engine` already tracks transaction state per connecti
 [SQL frontend](https://github.com/sidhesha/db_engine/blob/master/docs/ROADMAP.md)); the bridge just
 has to not get in the way of that.
 
+## Live deployment
+
+| | |
+|---|---|
+| Frontend | [sidhesha.github.io/db_engine-console](https://sidhesha.github.io/db_engine-console/) — GitHub Pages, auto-deployed from `frontend/` on every push |
+| Backend | Render, free tier — auto-deployed from this repo's `Dockerfile` via `render.yaml` |
+
+Free-tier backend sleeps after ~15 min idle; the first query after a quiet spell takes ~30-60s to
+wake it up. Accepted tradeoff for an occasionally-visited link, not a bug.
+
+**Deploying your own copy:** fork this repo, then Render → "New +" → "Blueprint" pointed at your
+fork (`render.yaml` handles the rest), and in your fork's Settings → Pages set Source to "GitHub
+Actions".
+
 ## Run it locally
 
 You need a `db_engine` binary. Either build it from the
@@ -37,7 +68,8 @@ docker run -p 8080:8080 db-engine-console
 ```
 
 Then serve `frontend/` with any static file server (e.g. `npx http-server frontend -p 5500`) and
-open it in a browser — `frontend/config.js` defaults to `ws://localhost:8080`.
+open it in a browser — `frontend/config.js` auto-detects localhost and points at
+`ws://localhost:8080`.
 
 To run the backend directly instead of via Docker:
 
@@ -61,21 +93,13 @@ db_engine-console/
     └── deploy-pages.yml   Publishes frontend/ to GitHub Pages on every push to master
 ```
 
-## Deploying
+## Redeploying against a newer db_engine
 
-**Backend** (Render, free tier): create a Render account, "New +" → "Blueprint", point it at this
-repo — `render.yaml` is picked up automatically. Free-tier services sleep after ~15 min idle and
-take ~30-60s to wake on the next request; an accepted tradeoff for an occasionally-visited link, not
-a bug.
+`Dockerfile`'s `DB_ENGINE_REF` build arg pins an exact `db_engine` commit — bump it and push to
+deploy a newer engine build:
 
-**Frontend** (GitHub Pages, free): in this repo's Settings → Pages, set Source to "GitHub Actions"
-(one-time). `.github/workflows/deploy-pages.yml` then publishes `frontend/` on every push to
-`master`.
-
-Once the backend has a real URL, point the frontend at it by editing `frontend/config.js`:
-
-```js
-window.DB_ENGINE_WS_URL = "wss://<your-render-service>.onrender.com";
+```dockerfile
+ARG DB_ENGINE_REF=b2b5616   # <- update to the commit you want deployed
 ```
 
 ## Wire protocol
