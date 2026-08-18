@@ -2,7 +2,15 @@
 # Pinned to a specific commit (not a moving branch) for reproducible
 # builds -- bump this once db_engine's Linux port (PR #16) merges to
 # master, or whenever a newer db_engine commit should be deployed.
-FROM ubuntu:24.04 AS engine-build
+#
+# Built from the *same* base image as the runtime stage below
+# (node:22-slim), not a generic ubuntu image -- a binary compiled against
+# a newer glibc/libstdc++ than the runtime image ships fails to even
+# start ("version `GLIBCXX_3.4.32' not found"), a classic multi-stage
+# Docker pitfall. Confirmed the hard way: an earlier ubuntu:24.04 build
+# stage produced exactly that error in CI (no local Docker available to
+# have caught this before pushing).
+FROM node:22-slim AS engine-build
 ARG DB_ENGINE_REF=1ac01e8c65da50d2beca2fe57bc426c27c868a32
 RUN apt-get update && apt-get install -y --no-install-recommends \
         build-essential cmake git ca-certificates \
